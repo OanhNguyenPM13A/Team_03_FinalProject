@@ -1,0 +1,23 @@
+{
+  "name": "team_03_finalproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OanhNguyenPM13A/Team_03_FinalProject.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/OanhNguyenPM13A/Team_03_FinalProject/issues"
+  },
+  "homepage": "https://github.com/OanhNguyenPM13A/Team_03_FinalProject#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^25.0.10"
+  }
+}
