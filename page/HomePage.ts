@@ -6,6 +6,8 @@ export class HomePage {
     readonly userMenuButton: Locator;
     readonly loginButton: Locator;
     readonly registerButton: Locator;
+    readonly locationSelect: Locator;
+    readonly searchIconButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -32,6 +34,17 @@ export class HomePage {
         
         this.loginButton = page.getByRole("button", {name: "Đăng nhập"})
                             .or(page.locator("li.py-2:has-text('Đăng nhập')"));
+
+        
+        // <div class="col-span-3  flex-1 px-6 py-3 flex flex-col justify-center items-center cursor-pointer " >
+        //     <p class="text-sm" > Địa điểm </p>
+        //     < p class="text-sm font-bold" > Hồ Chí Minh </p>
+        //     < div class="smm:border-b md:hidden smm:border-gray-400 smm:w-9/12 py-2" ></div>
+        // </div>
+
+        this.locationSelect = page.locator("div.cursor-pointer:has-text('Địa điểm')");
+
+        this.searchIconButton = page.locator("//*[@id='root']/div[2]/div[1]/div[5]/div");
     }
 
     // Step1: Access website
@@ -60,4 +73,28 @@ export class HomePage {
         await this.loginButton.waitFor({state: 'visible', timeout: 6000})
         await this.loginButton.click();
     }
+
+    //Step4: Select location
+    async selectLocation(location: string): Promise<void> {
+        await this.locationSelect.click();
+        await this.page.waitForTimeout(2000);
+        //*[@id="root"]/div[2]/div[1]/div/div[2]
+        let optionPath = "";
+        if(location === "Hồ Chí Minh"){
+            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[2]/div[1]";
+        }else if(location === "Hà Nội"){
+            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[2]/div[2]";
+        }else if(location === "Cần Thơ"){
+            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[3]]";
+        } 
+        await this.page.locator(optionPath).click();
+        await this.page.waitForTimeout(2000);
+    }
+
+    // Step5: Click Search Icon Button
+    async clickSearchIconButton(): Promise<void> {
+        await this.searchIconButton.click();
+        await this.page.waitForTimeout(2000);
+    }
+    
 }
