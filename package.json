@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:register": "playwright test Register --project=chromium --headed"
+    "test:register": "playwright test Register --project=chromium --headed",
+    "test:search": "playwright test Search --project=chromium --headed"
   },
   "repository": {
     "type": "git",
