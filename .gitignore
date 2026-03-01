@@ -1,8 +1,18 @@
 
-# Playwright
+# Dependencies
 node_modules/
+
+# Playwright artifacts
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/screenshots/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env

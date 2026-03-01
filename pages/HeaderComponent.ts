@@ -1,30 +1,28 @@
 import { type Page, type Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
+import { TIMEOUTS } from '../constants';
 
-// Header nav bar — user icon, auth dropdown, logged-in state
 export class HeaderComponent extends BasePage {
-    // Dropdown items (visible after clicking user icon)
     readonly loginDropdownBtn: Locator;
     readonly registerDropdownBtn: Locator;
+    readonly signOutBtn: Locator;
 
     constructor(page: Page) {
         super(page);
         this.loginDropdownBtn = page.getByRole('button', { name: 'Đăng nhập' });
         this.registerDropdownBtn = page.getByRole('button', { name: 'Đăng ký' });
+        this.signOutBtn = page.getByRole('button', { name: 'Sign out' });
     }
 
-    // The user icon changes depending on login state.
-    // Before login: nameless button with just an img
-    // After login: "Open user menu <name>"
     private getUserIconBtn(): Locator {
         return this.page.locator('nav button').filter({ has: this.page.locator('img') }).first();
     }
 
     async openUserDropdown(): Promise<void> {
         const btn = this.getUserIconBtn();
-        await btn.waitFor({ state: 'visible', timeout: 10_000 });
+        await btn.waitFor({ state: 'visible', timeout: TIMEOUTS.LONG });
         await btn.click();
-        await this.page.waitForTimeout(500);
+        await this.loginDropdownBtn.or(this.signOutBtn).first().waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
     }
 
     async openLoginPopup(): Promise<void> {
@@ -45,6 +43,7 @@ export class HeaderComponent extends BasePage {
 
     async logout(): Promise<void> {
         await this.openUserDropdown();
-        await this.page.getByRole('button', { name: 'Sign out' }).click();
+        await this.signOutBtn.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
+        await this.signOutBtn.click();
     }
 }

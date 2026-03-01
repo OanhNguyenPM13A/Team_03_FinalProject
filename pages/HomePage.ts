@@ -1,9 +1,9 @@
-import { Page, Locator } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
+import { BasePage } from './BasePage';
+import { TIMEOUTS } from '../constants';
 import { Helper } from '../utils/helper';
 
-export class HomePage {
-    readonly page: Page;
-
+export class HomePage extends BasePage {
     readonly userMenuButton: Locator;
     readonly loginButton: Locator;
     readonly registerButton: Locator;
@@ -12,132 +12,82 @@ export class HomePage {
     readonly searchIconButton: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
 
-        // <button 
-        //     class=" text-sm bg-main rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 font-bold duration-300 hover:scale-105 hover:bg-white hover:text-white"
-        // >
-        //     <img
-        //         class="h-10"
-        //         src="https://cdn-icons-png.flaticon.com/512/6596/6596121.png"
-        //     >
-        // </button>
         this.userMenuButton = page.locator("button:has(img[src*='6596121.png'])")
-            .or(page.locator("button.bg-main.rounded-full:has(img)"));
+            .or(page.locator('nav button').filter({ has: page.locator('img') }).first());
 
-        // <li>
-        //     <button
-        //         class="block text-center px-5 w-full rounded py-2 text-sm text-gray-700 hover:bg-gray-300 "
-        //         >Đăng ký
-        //     </button>
-        // </li>
-        this.registerButton = page.getByRole("button", { name: "Đăng ký" })
-            .or(page.locator("li.py-2:has-text('Đăng ký')"));
-
-        this.loginButton = page.getByRole("button", { name: "Đăng nhập" })
-            .or(page.locator("li.py-2:has-text('Đăng nhập')"));
-
-
-        // <div class="col-span-3  flex-1 px-6 py-3 flex flex-col justify-center items-center cursor-pointer " >
-        //     <p class="text-sm" > Địa điểm </p>
-        //     < p class="text-sm font-bold" > Hồ Chí Minh </p>
-        //     < div class="smm:border-b md:hidden smm:border-gray-400 smm:w-9/12 py-2" ></div>
-        // </div>
+        this.registerButton = page.getByRole('button', { name: 'Đăng ký' });
+        this.loginButton = page.getByRole('button', { name: 'Đăng nhập' });
 
         this.locationSelect = page.locator("div.cursor-pointer:has-text('Địa điểm')");
-
-        //*[@id="root"]/div[2]/div[1]/div[3]
         this.checkInPicker = page.locator("//*[@id='root']/div[2]/div[1]/div[3]");
-
         this.searchIconButton = page.locator("//*[@id='root']/div[2]/div[1]/div[5]/div");
     }
 
-    // Step1: Access website
-    async goto(timeout: number = 60000): Promise<void> {
-        await this.page.goto('https://demo5.cybersoft.edu.vn', { timeout, waitUntil: 'load' });
-        // await this.page.goto('https://demo5.cybersoft.edu.vn', {timeout, waitUntil: 'networkidle'});
+    async goto(timeout: number = 60_000): Promise<void> {
+        await this.page.goto('/', { timeout, waitUntil: 'load' });
+        await this.page.waitForLoadState('domcontentloaded');
     }
 
-    // Step2: Click User Menu
     async clickUserMenu(): Promise<void> {
-        await this.userMenuButton.waitFor({ state: 'visible', timeout: 6000 })
-        await this.userMenuButton.click();
-        await this.page.waitForTimeout(2000);
+        await this.userMenuButton.first().waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
+        await this.userMenuButton.first().click();
+        await this.loginButton.waitFor({ state: 'visible', timeout: TIMEOUTS.SHORT });
     }
 
-    // Step3.1: Click Register Button
     async clickDangKyButton(): Promise<void> {
-        await this.registerButton.waitFor({ state: 'visible', timeout: 6000 })
+        await this.registerButton.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
         await this.registerButton.click();
-
-        await this.page.waitForTimeout(2000);
+        await this.page.locator('.ant-modal-content').waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
     }
 
-    // Step3.2: Click Login Button
     async clickLoginButton(): Promise<void> {
-        await this.loginButton.waitFor({ state: 'visible', timeout: 6000 })
+        await this.loginButton.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
         await this.loginButton.click();
     }
 
-    //Step4.1: Select location
     async selectLocation(location: string): Promise<void> {
         await this.locationSelect.click();
-        await this.page.waitForTimeout(2000);
-        //*[@id="root"]/div[2]/div[1]/div/div[2]
-        let optionPath = "";
-        if (location === "Hồ Chí Minh") {
-            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[2]/div[1]";
-        } else if (location === "Hà Nội") {
-            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[2]/div[2]";
-        } else if (location === "Cần Thơ") {
-            optionPath = "//*[@id='root']/div[2]/div[1]/div/div[3]]";
-        }
-        await this.page.locator(optionPath).click();
-        await this.page.waitForTimeout(2000);
+
+        const locationOption = this.page.getByText(location, { exact: true }).first();
+        await locationOption.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
+        await locationOption.click();
     }
 
-    // Step4.2: Select check-in/check-out date
-    async selectCheckInOutDate(
-        checkIn: string,
-        checkOut: string
-    ): Promise<void> {
-        // 1. Open date picker
+    async selectCheckInOutDate(checkIn: string, checkOut: string): Promise<void> {
         await this.checkInPicker.click();
 
-        // 2. Get day number (07 → "7")
         const checkInDay = Helper.getDay(checkIn);
         const checkOutDay = Helper.getDay(checkOut);
-        
-        // 3. Scope month
-        const feb2026 = this.page
+
+        const [, monthNum, year] = checkIn.split('/');
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthLabel = `${monthNames[Number(monthNum) - 1]} ${year}`;
+
+        const targetMonth = this.page
             .locator('.rdrMonth')
-            .filter({ hasText: 'Feb 2026' });
+            .filter({ hasText: monthLabel });
 
-        await feb2026.waitFor({ state: 'visible', timeout: 6000 });
+        await targetMonth.waitFor({ state: 'visible', timeout: TIMEOUTS.MEDIUM });
 
-        // 4. Click check-in
-        await feb2026
+        await targetMonth
             .locator('.rdrDay')
             .filter({ hasNot: this.page.locator('.rdrDayDisabled') })
             .getByText(checkInDay, { exact: true })
             .first()
             .click();
 
-        // 5. Click check-out
-        await feb2026
+        await targetMonth
             .locator('.rdrDay')
             .filter({ hasNot: this.page.locator('.rdrDayDisabled') })
             .getByText(checkOutDay, { exact: true })
             .first()
             .click();
-        
-        await this.page.waitForTimeout(3000);
     }
 
-    // Step5: Click Search Icon Button
     async clickSearchIconButton(): Promise<void> {
         await this.searchIconButton.click();
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForLoadState('domcontentloaded');
     }
-
 }

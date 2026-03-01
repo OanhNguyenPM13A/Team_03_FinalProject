@@ -4,8 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
+    "test:auth": "playwright test auth.spec --project=chromium --headed",
     "test:register": "playwright test Register --project=chromium --headed",
-    "test:search": "playwright test Search --project=chromium --headed"
+    "test:search": "playwright test Search --project=chromium --headed",
+    "test:profile": "playwright test profile --project=chromium --headed",
+    "test:all": "playwright test --project=chromium --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --project=chromium --headed --debug",
+    "report": "playwright show-report"
   },
   "repository": {
     "type": "git",
@@ -21,6 +29,7 @@
   "homepage": "https://github.com/OanhNguyenPM13A/Team_03_FinalProject#readme",
   "devDependencies": {
     "@playwright/test": "^1.58.0",
-    "@types/node": "^25.0.10"
+    "@types/node": "^25.0.10",
+    "dotenv": "^17.3.1"
   }
 }
