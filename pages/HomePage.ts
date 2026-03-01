@@ -10,6 +10,7 @@ export class HomePage {
     readonly locationSelect: Locator;
     readonly checkInPicker: Locator;
     readonly searchIconButton: Locator;
+    readonly guestSelect: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -50,6 +51,20 @@ export class HomePage {
         this.checkInPicker = page.locator("//*[@id='root']/div[2]/div[1]/div[3]");
 
         this.searchIconButton = page.locator("//*[@id='root']/div[2]/div[1]/div[5]/div");
+
+        // <div class="z-10 absolute w-[300px] top-[70px] right-0 bg-white rounded-full px-6 py-3 border-2 border-gray-300 overflow-y-auto overscroll-y-auto cursor-auto flex justify-between items-center">
+        //     <div class="text-md">Khách</div>
+        //     <div class="flex justify-between items-center gap-3">
+        //         <button class="font-bold w-6 h-6 text-white bg-[#FF5A5F] hover:bg-[#9e3e4e] rounded-full duration-300 flex items-center justify-center cursor-not-allowed opacity-50" disabled="">
+        //             <div>-</div>
+        //         </button>
+        //         <div class="text-md">1</div>
+        //         <button class="font-bold w-6 h-6 text-white bg-[#FF5A5F] hover:bg-[#9e3e4e] rounded-full duration-300 flex items-center justify-center">
+        //             <div>+</div>
+        //         </button>
+        //     </div>
+        // </div>
+        this.guestSelect = page.locator("div.cursor-pointer:has-text('Khách')");
     }
 
     // Step1: Access website
@@ -101,42 +116,116 @@ export class HomePage {
         checkIn: string,
         checkOut: string
     ): Promise<void> {
+
         // 1. Open date picker
         await this.checkInPicker.click();
+        await this.page.waitForTimeout(2000);
 
-        // 2. Get day number (07 → "7")
-        const checkInDay = Helper.getDay(checkIn);
-        const checkOutDay = Helper.getDay(checkOut);
+        // 2. Get day and month from date string (DD/MM/YYYY)
+        const [checkInDay, checkInMonth, checkInYear] = checkIn.split('/');
+        const [checkOutDay, checkOutMonth, checkOutYear] = checkOut.split('/');
+
+        const checkInDayNum = Helper.getDay(checkIn);
+        const checkOutDayNum = Helper.getDay(checkOut);
         
-        // 3. Scope month
-        const feb2026 = this.page
-            .locator('.rdrMonth')
-            .filter({ hasText: 'Feb 2026' });
+        // 3. Wait for date picker container to be visible
+        const datePickerContainer = this.page.locator('[class*="rdrDateRangeWrapper"], [class*="rdrMonths"]').first();
+        await datePickerContainer.waitFor({ state: 'visible', timeout: 8000 }).catch(() => {
+            // If specific container not found, try waiting for any month element
+            return this.page.locator('.rdrMonth').first().waitFor({ state: 'visible', timeout: 5000 });
+        });
 
-        await feb2026.waitFor({ state: 'visible', timeout: 6000 });
+        await this.page.waitForTimeout(1500);
 
-        // 4. Click check-in
-        await feb2026
-            .locator('.rdrDay')
-            .filter({ hasNot: this.page.locator('.rdrDayDisabled') })
-            .getByText(checkInDay, { exact: true })
-            .first()
-            .click();
+        // 4. Find the correct month container for check-in date
+        // Month format expected: "Feb" for February
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const checkInMonthName = monthNames[parseInt(checkInMonth) - 1];
+        const checkInYearStr = checkInYear;
 
-        // 5. Click check-out
-        await feb2026
-            .locator('.rdrDay')
-            .filter({ hasNot: this.page.locator('.rdrDayDisabled') })
-            .getByText(checkOutDay, { exact: true })
-            .first()
-            .click();
+        const monthContainers = this.page.locator('.rdrMonth');
+        const monthCount = await monthContainers.count();
+
+        let checkInMonthElement = null;
+        for (let i = 0; i < monthCount; i++) {
+            const monthText = await monthContainers.nth(i).textContent();
+            if (monthText?.includes(checkInMonthName) && monthText?.includes(checkInYearStr)) {
+                checkInMonthElement = monthContainers.nth(i);
+                break;
+            }
+        }
+
+        if (!checkInMonthElement) {
+            throw new Error(`Could not find month ${checkInMonthName} ${checkInYearStr} in date picker`);
+        }
+
+        // 5. Click check-in day
+        try {
+            await checkInMonthElement
+                .locator('.rdrDay')
+                .getByText(checkInDayNum, { exact: true })
+                .first()
+                .click({ timeout: 5000 });
+        } catch (error) {
+            throw new Error(`Failed to select check-in date: ${checkIn}`);
+        }
+
+        await this.page.waitForTimeout(1000);
+
+        // 6. Find month element for check-out date (might be same or different month)
+        const checkOutMonthName = monthNames[parseInt(checkOutMonth) - 1];
+        const checkOutYearStr = checkOutYear;
+
+        let checkOutMonthElement = null;
+        for (let i = 0; i < monthCount; i++) {
+            const monthText = await monthContainers.nth(i).textContent();
+            if (monthText?.includes(checkOutMonthName) && monthText?.includes(checkOutYearStr)) {
+                checkOutMonthElement = monthContainers.nth(i);
+                break;
+            }
+        }
+
+        if (!checkOutMonthElement) {
+            throw new Error(`Could not find month ${checkOutMonthName} ${checkOutYearStr} in date picker`);
+        }
+
+        // 7. Click check-out day
+        try {
+            await checkOutMonthElement
+                .locator('.rdrDay')
+                .getByText(checkOutDayNum, { exact: true })
+                .first()
+                .click({ timeout: 5000 });
+        } catch (error) {
+            throw new Error(`Failed to select check-out date: ${checkOut}`);
+        }
         
-        await this.page.waitForTimeout(3000);
+        await this.page.waitForTimeout(2000);
     }
 
+    // Step4.3: Select number of guests
+    async selectGuests(numGuests: number): Promise<void> {
+        await this.guestSelect.click();
+        await this.page.waitForTimeout(2000);
+
+        const plusButton = this.page.locator("button:has-text('+')");
+        for (let i = 1; i < numGuests; i++) {
+            await plusButton.click();
+            await this.page.waitForTimeout(1000);
+        }
+    }
+    
     // Step5: Click Search Icon Button
     async clickSearchIconButton(): Promise<void> {
-        await this.searchIconButton.click();
+        await this.searchIconButton.first().click();
+        await this.page.waitForTimeout(6000);
+    }
+
+    // Step6: Scroll down to view results
+    async scrollDown(pixels: number = 300): Promise<void> {
+        await this.page.evaluate((scrollAmount) => {
+            window.scrollBy(0, scrollAmount);
+        }, pixels);
         await this.page.waitForTimeout(2000);
     }
 

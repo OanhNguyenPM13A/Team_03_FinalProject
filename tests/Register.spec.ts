@@ -1,6 +1,6 @@
 import {test, expect} from '@playwright/test';
-import { HomePage } from '../page/HomePage';
-import { RegisterModal } from '../page/RegisterModal';
+import { HomePage } from '../pages/HomePage';
+import { RegisterModal } from '../pages/RegisterModal';
 
 test.describe('Register', () => {
     test('Register new account', async ({page}) => {
