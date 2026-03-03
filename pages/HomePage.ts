@@ -11,6 +11,7 @@ export class HomePage {
     readonly checkInPicker: Locator;
     readonly searchIconButton: Locator;
     readonly guestSelect: Locator;
+    readonly priceFilterButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -65,6 +66,10 @@ export class HomePage {
         //     </div>
         // </div>
         this.guestSelect = page.locator("div.cursor-pointer:has-text('Khách')");
+
+    //     <button class="rounded-lg  text-md bg-white text-black border border-gray-300 hover:border-gray-900 duration-300 px-6 py-2">Giá</button>
+    this.priceFilterButton = page.locator("button:has-text('Giá')").first();
+
     }
 
     // Step1: Access website
@@ -215,18 +220,23 @@ export class HomePage {
         }
     }
     
+    // Step4.4: Set price range filter (example: min price)
+    async setPriceFilter(minPrice: number): Promise<void> {
+        await this.priceFilterButton.click();
+        await this.page.waitForTimeout(2000);
+    }
     // Step5: Click Search Icon Button
     async clickSearchIconButton(): Promise<void> {
         await this.searchIconButton.first().click();
-        await this.page.waitForTimeout(6000);
+        await this.page.waitForTimeout(3000);
     }
 
-    // Step6: Scroll down to view results
-    async scrollDown(pixels: number = 300): Promise<void> {
-        await this.page.evaluate((scrollAmount) => {
-            window.scrollBy(0, scrollAmount);
-        }, pixels);
-        await this.page.waitForTimeout(2000);
+    // Click room card
+    async clickRoomCard(index: number = 0): Promise<void> {
+        const roomCard = this.page.locator('.ant-card').nth(index);
+        await roomCard.waitFor({ state: 'visible', timeout: 5000 });
+        await roomCard.click();
+        await this.page.waitForTimeout(3000);
     }
 
 }

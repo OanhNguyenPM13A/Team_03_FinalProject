@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:register": "playwright test Register --project=chromium --headed",
-    "test:search": "playwright test Search --project=chromium --headed"
+    "test:search": "playwright test search --project=chromium --headed",
+    "test:roomdetails": "playwright test roomdetails --project=chromium --headed",
+    "test:roomcard": "playwright test roomcard --project=chromium --headed",
+    "test:booking": "playwright test booking --project=chromium --headed"
   },
   "repository": {
     "type": "git",
