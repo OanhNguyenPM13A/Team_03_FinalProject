@@ -9,8 +9,8 @@ export const TOKEN_CYBERSOFT =
 
 // Test account — register this manually on the site first
 export const TEST_USER = {
-    email: process.env.TEST_USER_EMAIL || 'test@airbnb.vn',
-    password: process.env.TEST_USER_PASSWORD || 'Test@123',
+    email: process.env.TEST_USER_EMAIL || 'nguyenthikieuoanh948@gmail.com',
+    password: process.env.TEST_USER_PASSWORD || 'Oanh123456',
 };
 
 // API routes
