@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test --project=chromium",
+    "test": "playwright test --project=chromium --headed",
     "test:headed": "playwright test --project=chromium --headed",
     "test:auth": "playwright test auth.spec --project=chromium --headed",
     "test:search": "playwright test search --project=chromium --headed",

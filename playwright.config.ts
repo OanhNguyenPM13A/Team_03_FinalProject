@@ -3,6 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 const dotenv = require('dotenv');
 const path = require('path');
 
+dotenv.config();
+
 export default defineConfig({
   testDir: './tests',
   timeout: 60_000,
