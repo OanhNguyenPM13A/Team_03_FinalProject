@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const dotenv = require('dotenv');
 const path = require('path');
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 export default defineConfig({
   testDir: './tests',
