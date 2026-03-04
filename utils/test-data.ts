@@ -1,19 +1,17 @@
 import type { UserData } from './api-helper';
 
 /**
- * Generates test data for user registration and profile tests.
- * Uses deterministic patterns with timestamps to avoid collisions.
+ * Generates unique test data for user registration and profile tests.
+ * Uses timestamps + counter to avoid collisions across parallel runs.
  */
 export class TestDataGenerator {
     private static counter = 0;
 
-    /** Generate a unique suffix based on timestamp + counter. */
     private static uniqueSuffix(): string {
         TestDataGenerator.counter++;
         return `${Date.now()}_${TestDataGenerator.counter}`;
     }
 
-    /** Generate a valid user for registration. */
     static validUser(): UserData {
         const suffix = TestDataGenerator.uniqueSuffix();
         return {
@@ -27,14 +25,12 @@ export class TestDataGenerator {
         };
     }
 
-    /** Generate user data with a weak password. */
     static userWithWeakPassword(): UserData {
         const user = TestDataGenerator.validUser();
         user.password = '123';
         return user;
     }
 
-    /** Generate user data for profile update (no password field). */
     static profileUpdate(): Omit<UserData, 'password'> {
         const suffix = TestDataGenerator.uniqueSuffix();
         return {
@@ -46,7 +42,6 @@ export class TestDataGenerator {
         };
     }
 
-    /** Return invalid login credentials. */
     static invalidCredentials() {
         return {
             email: 'nonexistent@fake.com',
