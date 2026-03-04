@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import { RoomCard } from '../pages/RoomCard';
 import { HomePage } from '../pages/HomePage';
 import { Helper } from '../utils/helper';
+import { TIMEOUTS } from '../constants';
 test.describe.serial('Room card Module ====>', () => {
     test('TC: Verify that the information displayed on the room card  is complete.', async ({ page }) => {
         // Initialize 
@@ -16,7 +17,7 @@ test.describe.serial('Room card Module ====>', () => {
         await homePage.clickSearchIconButton();
 
         // Step3: Wait for results to load
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(TIMEOUTS.SHORT);
 
         // Step4: Scroll gradually to bottom of page
         await Helper.scrollDown(homePage.page, 300);
