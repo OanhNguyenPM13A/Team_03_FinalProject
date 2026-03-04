@@ -47,7 +47,7 @@ export class RegisterPopup extends BasePage {
         }
         if (user.gender !== undefined) {
             await this.genderCombobox.click({ force: true });
-            await this.page.waitForTimeout(300);
+            await this.page.waitForTimeout(2000);
             const label = user.gender ? 'Nam' : 'Nữ';
             await this.page.getByText(label, { exact: true }).click();
         }
@@ -55,6 +55,7 @@ export class RegisterPopup extends BasePage {
 
     async register(user: UserData): Promise<void> {
         await this.fillForm(user);
+        await this.page.waitForTimeout(2000);
         await this.submitBtn.scrollIntoViewIfNeeded();
         await this.submitBtn.click();
     }

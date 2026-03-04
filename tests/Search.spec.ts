@@ -3,8 +3,8 @@ import { HomePage } from '../pages/HomePage';
 import { Helper } from '../utils/helper';
 
 // Run all tests in this describe block sequentially (one after another)
-test.describe.serial('Search Module ====>', () => {
-    test('TC: Search for a location : Hồ Chí Minh', async ({ page }) => {
+test.describe.serial('Module 2: Search ====>', () => {
+    test('TC08: Search for a location : Hồ Chí Minh', async ({ page }) => {
         // Initialize HomePage object
         const homePage = new HomePage(page);
 
@@ -37,7 +37,7 @@ test.describe.serial('Search Module ====>', () => {
     });
 
     
-    test('TC: Search for check-in/check-out', async ({ page }) => {
+    test('TC09: Search for check-in/check-out', async ({ page }) => {
         //Initialize HomePage object
         const homePage = new HomePage(page);
 
@@ -72,7 +72,7 @@ test.describe.serial('Search Module ====>', () => {
     });
 
     // TC10: Search for number of guests
-    test('TC: Search for number of guests', async ({ page }) => {
+    test('TC10: Search for number of guests', async ({ page }) => {
         // Initialize HomePage object
         const homePage = new HomePage(page);
 

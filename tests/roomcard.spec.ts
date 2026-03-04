@@ -3,7 +3,7 @@ import { RoomCard } from '../pages/RoomCard';
 import { HomePage } from '../pages/HomePage';
 import { Helper } from '../utils/helper';
 import { TIMEOUTS } from '../constants';
-test.describe.serial('Room card Module ====>', () => {
+test.describe.serial('Room card ====>', () => {
     test('TC: Verify that the information displayed on the room card  is complete.', async ({ page }) => {
         // Initialize 
         const homePage = new HomePage(page);

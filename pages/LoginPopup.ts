@@ -31,6 +31,7 @@ export class LoginPopup extends BasePage {
         await this.waitForOpen();
         await this.emailInput.fill(email);
         await this.passwordInput.fill(password);
+        await this.page.waitForTimeout(TIMEOUTS.SHORT); 
         await this.submitBtn.click();
     }
 
