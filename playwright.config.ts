@@ -18,10 +18,10 @@ export default defineConfig({
   workers: 1,
 
   reporter: [
-  ['html', { open: 'never' }],
-  ['list'],
-  ['junit', { outputFile: 'test-results/junit.xml' }],
-],
+    ['line'],
+    ['html', { outputFolder: 'playwright-report' }],
+    ['junit', { outputFile: 'test-results/results.xml' }],
+  ],
 
   use: {
     baseURL: process.env.BASE_URL,

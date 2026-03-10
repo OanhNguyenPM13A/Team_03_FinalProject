@@ -42,7 +42,7 @@ jobs:
       - name: Run Playwright tests
         id: playwright
         continue-on-error: true
-        run: npx playwright test --reporter=html,line,junit
+        run: npx playwright test
         env:
           CI: true
           BASE_URL: ${{ secrets.BASE_URL }}
@@ -77,8 +77,7 @@ jobs:
         with:
           name: Playwright Test Results (Node ${{ matrix.node-version }})
           path: |
-            test-results/**/*.xml
-            junit.xml
+            test-results/results.xml
           reporter: java-junit
           fail-on-error: false
 
