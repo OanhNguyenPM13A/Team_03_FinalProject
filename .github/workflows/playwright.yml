@@ -84,3 +84,20 @@ jobs:
       - name: Show warning if tests failed
         if: steps.playwright.outcome == 'failure'
         run: echo "⚠️ Some Playwright tests failed, but CI is allowed to pass."
+
+      - name: Notify Slack
+        if: always()
+        run: |
+            STATUS="✅ PASSED"
+            if [ "${{ steps.playwright.outcome }}" = "failure" ]; then
+              STATUS="❌ FAILED"
+            fi
+
+                curl -X POST -H 'Content-type: application/json' \
+                --data "{
+                  \"text\": \"Playwright Test ${STATUS}
+            Repository: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+                }" \
+                ${{ secrets.SLACK_WEBHOOK_URL }}
