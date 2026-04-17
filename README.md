@@ -7,40 +7,45 @@ Playwright end-to-end test suite for the **Airbnb Clone** web application at [de
 ```
 Team_03_FinalProject/
 ├── constants/
-│   └── index.ts              # Reads config from .env (URLs, token, credentials, timeouts)
+│   └── index.ts              # Configuration from .env (BASE_URL, credentials, timeouts)
 ├── pages/                     # Page Object Model (POM) classes
-│   ├── BasePage.ts            # Base class — navigateTo, waitForVisible, takeScreenshot
-│   ├── HeaderComponent.ts     # Header nav — user menu, login/register/logout dropdown
-│   ├── HomePage.ts            # Home page — location search, date picker, search button
-│   ├── LoginPopup.ts          # Login modal — email, password, submit
-│   ├── RegisterPopup.ts       # Register modal (Member 1) — scoped dialog form
-│   ├── RegisterModal.ts       # Register modal (Member 2) — ant-modal form
-│   └── ProfilePage.ts         # User profile — view/edit info, upload avatar
-├── tests/                     # Test specifications (serial execution)
-│   ├── auth.setup.ts          # Authentication setup — saves logged-in browser state
+│   ├── BasePage.ts            # Base class with common utilities
+│   ├── HeaderComponent.ts     # Header navigation & user menu
+│   ├── HomePage.ts            # Home page - location search, date picker
+│   ├── LoginPopup.ts          # Login modal
+│   ├── RegisterPopup.ts       # Register modal
+│   ├── ProfilePage.ts         # User profile management
+│   ├── RoomDetailsPage.ts     # Room details view
+│   ├── RoomCard.ts            # Room card component
+│   └── Booking.ts             # Booking form & logic
+├── tests/                     # Test specifications (sequential execution)
+│   ├── auth.setup.ts          # Authentication setup
 │   ├── auth.spec.ts           # Module 1: Authentication (TC01–TC07)
-│   ├── Register.spec.ts       # Module 2: Registration flow
-│   ├── Search.spec.ts         # Module 3: Search & Booking (TC08–TC09)
-│   └── profile.spec.ts        # Module 4: User Profile (TC22–TC26)
+│   ├── Search.spec.ts         # Module 2: Search functionality
+│   ├── roomcard.spec.ts       # Module 3: Room card information
+│   ├── roomdetails.spec.ts    # Module 4: Room details display
+│   ├── booking.spec.ts        # Module 5: Booking functionality
+│   └── profile.spec.ts        # Module 6: User Profile
 ├── utils/
-│   ├── api-helper.ts          # Shared interfaces (UserData, LoginResponse)
-│   ├── helper.ts              # Date parsing and search utilities
-│   └── test-data.ts           # Random test data generators (users, credentials)
-├── .env                       # Environment variables (not committed)
-├── .env.example               # Template for .env setup
-├── playwright.config.ts       # Playwright config — baseURL, video, trace, serial mode
+│   ├── api-helper.ts          # Shared interfaces & API utilities
+│   ├── helper.ts              # Date parsing and scroll utilities
+│   └── test-data.ts           # Random test data generators
+├── .env                       # Environment variables (BASE_URL, credentials)
+├── playwright.config.ts       # Playwright configuration
 ├── package.json               # Dependencies and npm scripts
 └── README.md
 ```
 
 ## Test Modules
 
-| Module | File | Test Cases | Description |
-|--------|------|------------|-------------|
-| Authentication | `auth.spec.ts` | TC01–TC07 | Register, login, logout, error validation |
-| Registration | `Register.spec.ts` | Register flow | Full form: name, email, password, birthday, gender |
-| Search & Booking | `Search.spec.ts` | TC08–TC09 | Location search, date range picker |
-| User Profile | `profile.spec.ts` | TC22–TC26 | View/edit profile, upload avatar, change password |
+| Module | File | Description |
+|--------|------|-------------|
+| Authentication | `auth.spec.ts` | Register (TC01-TC03), Login (TC04), Logout, Error validation |
+| Search | `Search.spec.ts` | Location search, date range picker, search results |
+| Room Card | `roomcard.spec.ts` | Verify room card displays complete information |
+| Room Details | `roomdetails.spec.ts` | View room details, amenities, reviews |
+| Booking | `booking.spec.ts` | Booking form validation, date selection, user login |
+| User Profile | `profile.spec.ts` | View/edit profile, upload avatar, change password |
 
 ## Prerequisites
 
@@ -56,24 +61,26 @@ npm install
 # 2. Install Playwright browsers
 npx playwright install
 
-# 3. Create your .env from the template
-cp .env.example .env
-# Then fill in your actual values in .env
+# 3. Create your .env file (or update with your values)
+# The file should contain:
+#   BASE_URL=https://demo5.cybersoft.edu.vn
+#   TEST_USER_EMAIL=your-test-email@example.com
+#   TEST_USER_PASSWORD=your-test-password
 ```
 
 ### Environment Variables
 
-All config is loaded from `.env` via `dotenv`:
+Configuration is loaded from `.env` file:
 
-| Variable | Description |
-|----------|-------------|
-| `BASE_URL` | Target app URL (default: `https://demo5.cybersoft.edu.vn`) |
-| `TEST_USER_EMAIL` | Test account email |
-| `TEST_USER_PASSWORD` | Test account password |
+| Variable | Example | Description |
+|----------|---------|-------------|
+| `BASE_URL` | `https://demo5.cybersoft.edu.vn` | Target application URL |
+| `TEST_USER_EMAIL` | `test@example.com` | Test account email for login tests |
+| `TEST_USER_PASSWORD` | `TestPassword123` | Test account password for login tests |
 
 ## Running Tests
 
-All tests run **sequentially in a single browser** window (`workers: 1`, `serial` mode) — ideal for watching and screen recording.
+All tests run **sequentially** (`workers: 1`) — ideal for watching and screen recording.
 
 ### Headed mode (browser visible)
 
@@ -81,11 +88,13 @@ All tests run **sequentially in a single browser** window (`workers: 1`, `serial
 # Run ALL tests with browser open
 npm run test:headed
 
-# Run a specific module
-npm run test:auth
-npm run test:register
-npm run test:search
-npm run test:profile
+# Run specific test suites
+npm run test:auth        # Authentication tests
+npm run test:search      # Search tests
+npm run test:roomcard    # Room card tests
+npm run test:roomdetails # Room details tests
+npm run test:booking     # Booking tests
+npm run test:profile     # Profile tests
 ```
 
 ### Headless mode (no browser UI — faster, for CI)
@@ -97,11 +106,11 @@ npm test
 ### Debug and UI modes
 
 ```bash
-# Step-through debugger with Playwright Inspector
-npm run test:debug
-
 # Interactive test explorer with trace viewer
 npm run test:ui
+
+# Step-through debugger with Playwright Inspector
+npm run test:debug
 ```
 
 ## Viewing Results
@@ -125,43 +134,60 @@ Key settings in `playwright.config.ts`:
 
 ## Best Practices Applied
 
-Following the [official Playwright best practices](https://playwright.dev/docs/best-practices):
+- **Page Object Model (POM)** — Page interactions encapsulated in reusable classes
+- **Role-based locators** — `getByRole()` preferred over CSS/XPath selectors
+- **Web-first assertions** — `toBeVisible()`, `toContainText()` etc.
+- **Smart waits** — `waitForLoadState()`, `waitFor()` instead of fixed delays
+- **Environment variables** — All configuration loaded from `.env`
+- **Test data generators** — Unique test data per run to avoid collisions
+- **Sequential execution** — Tests run one after another for reliable recording
 
-- **Page Object Model (POM)** — All page interactions encapsulated in reusable classes extending `BasePage`
-- **Role-based locators** — `getByRole('button', { name: '...' })` preferred over CSS/XPath
-- **Web-first assertions** — `expect(locator).toBeVisible()` instead of manual `isVisible()` checks
-- **Smart waits** — `waitFor({ state: 'visible' })` and `waitForLoadState()` instead of `waitForTimeout()`
-- **Environment variables** — All secrets and URLs loaded from `.env` via `dotenv`, never hardcoded
-- **Test data generators** — Unique test data per run via `TestDataGenerator` to avoid collisions
-- **Serial execution** — `test.describe.serial()` for sequential, recordable test runs
+## Page Object Classes
 
-## Architecture
+### BasePage
+Base class with shared utilities for all page objects:
+- Navigation and page loading
+- Element waiting and visibility checks
+- Screenshot capture
 
-```
-BasePage (shared utilities)
-    ├── HeaderComponent    ← nav bar interactions
-    ├── HomePage           ← search bar, location picker
-    ├── LoginPopup         ← login dialog
-    ├── RegisterPopup      ← register dialog (Member 1)
-    ├── RegisterModal      ← register dialog (Member 2)
-    └── ProfilePage        ← user profile management
+### HeaderComponent
+Header navigation interactions:
+- User menu operations
+- Login/Register popup triggers
+- User authentication checks
 
-constants/index.ts         ← reads .env, exports config
-utils/test-data.ts         ← random user generators
-utils/api-helper.ts        ← shared interfaces
-utils/helper.ts            ← date/search utilities
-```
+### HomePage
+Home page interactions:
+- Location selection
+- Date range picker
+- Search functionality
+- Room card navigation
 
-## Team Members
+### LoginPopup & RegisterPopup
+Authentication dialogs:
+- Form filling and validation
+- Login/registration workflows
 
-| Member | Modules | Key Files |
-|--------|---------|-----------|
-| Member 1 | Auth, Profile | `auth.spec.ts`, `profile.spec.ts`, `LoginPopup.ts`, `RegisterPopup.ts`, `ProfilePage.ts`, `HeaderComponent.ts` |
-| Member 2 | Register, Search | `Register.spec.ts`, `Search.spec.ts`, `HomePage.ts`, `RegisterModal.ts`, `helper.ts` |
+### RoomCard
+Room card component:
+- Verify room information completeness
+- Room details validation
+
+### RoomDetailsPage
+Room details view:
+- Room information display
+- Amenities and reviews
+- Gallery navigation
+
+### ProfilePage
+User profile management:
+- View/edit profile information
+- Avatar upload
+- Password changes
 
 ## Tech Stack
 
 - [Playwright](https://playwright.dev/) v1.58+ — Browser automation & E2E testing
 - [TypeScript](https://www.typescriptlang.org/) — Type-safe test code
 - [dotenv](https://www.npmjs.com/package/dotenv) — Environment variable management
-- [Node.js](https://nodejs.org/) >= 18 — Runtime
+- [Node.js](https://nodejs.org/) >= 18 — Runtime environment

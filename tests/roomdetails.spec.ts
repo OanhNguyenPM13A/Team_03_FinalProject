@@ -8,9 +8,9 @@ import { TEST_USER } from '../constants';
 import { SearchTestData, RoomTestData } from '../utils/test-data';
 
 // Run all tests in this describe block sequentially (one after another)
-test.describe.serial('RoomDetails Module ====>', () => {
+test.describe.serial('RoomDetails ====>', () => {
     // TC: View room details
-    test('TC: View room details', async ({ page }) => {
+    test('TC12: View room details', async ({ page }) => {
         // Initialize HomePage object
         const homePage = new HomePage(page);
 
@@ -36,7 +36,7 @@ test.describe.serial('RoomDetails Module ====>', () => {
     });
 
      // TC: Verify login required alert when not logged in
-    test('TC: Verify complete room information display (without sign in)', async ({ page }) => {
+    test('TC13: Verify complete room information display (without sign in)', async ({ page }) => {
         // Initialize HomePage and RoomDetailsPage objects
         const homePage = new HomePage(page);
         const roomDetailsPage = new RoomDetailsPage(page);
