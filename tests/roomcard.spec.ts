@@ -3,7 +3,8 @@ import { RoomCard } from '../pages/RoomCard';
 import { HomePage } from '../pages/HomePage';
 import { Helper } from '../utils/helper';
 import { TIMEOUTS } from '../constants';
-test.describe.serial('Room card ====>', () => {
+import { SearchTestData, RoomTestData } from '../utils/test-data';
+test.describe.serial('Room card Module ====>', () => {
     test('TC: Verify that the information displayed on the room card  is complete.', async ({ page }) => {
         // Initialize 
         const homePage = new HomePage(page);
@@ -12,8 +13,8 @@ test.describe.serial('Room card ====>', () => {
         // Step1: Access website
         await homePage.goto();
 
-        // Step2: Do a search (location only)
-        await homePage.selectLocation('Hồ Chí Minh');
+        // Step2: Do a search using test data location
+        await homePage.selectLocation(SearchTestData.DEFAULT_LOCATION);
         await homePage.clickSearchIconButton();
 
         // Step3: Wait for results to load
@@ -22,8 +23,7 @@ test.describe.serial('Room card ====>', () => {
         // Step4: Scroll gradually to bottom of page
         await Helper.scrollDown(homePage.page, 300);
 
-        // await roomcard.verifyRoomCardHasFullInfo(0); // verify the first card
-        // or verify the top 3 cards:
-        await roomcard.verifyTopRoomCardsHaveFullInfo(3);
+        // Step5: Verify top rooms have complete information using test data
+        await roomcard.verifyTopRoomCardsHaveFullInfo(RoomTestData.TOP_ROOMS_TO_VERIFY);
     });
 });

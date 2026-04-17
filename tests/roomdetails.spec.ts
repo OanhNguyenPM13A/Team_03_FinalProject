@@ -5,6 +5,7 @@ import { HeaderComponent } from '../pages/HeaderComponent';
 import { LoginPopup } from '../pages/LoginPopup';
 import { Helper } from '../utils/helper';
 import { TEST_USER } from '../constants';
+import { SearchTestData, RoomTestData } from '../utils/test-data';
 
 // Run all tests in this describe block sequentially (one after another)
 test.describe.serial('RoomDetails ====>', () => {
@@ -16,8 +17,8 @@ test.describe.serial('RoomDetails ====>', () => {
         // Step1: Access website
         await homePage.goto();
 
-        // Step2: Do a search (location only)
-        await homePage.selectLocation('Hồ Chí Minh');
+        // Step2: Do a search using test data
+        await homePage.selectLocation(SearchTestData.DEFAULT_LOCATION);
         await homePage.clickSearchIconButton();
 
         // Step3: Wait for results to load
@@ -27,10 +28,10 @@ test.describe.serial('RoomDetails ====>', () => {
         await Helper.scrollToBottom(page, 300, 500);
 
         // Step5: Click on first room card to view details
-        await homePage.clickRoomCard(0);
+        await homePage.clickRoomCard(RoomTestData.ROOM_INDICES.first);
 
         // Step6: Verify room detail page is opened by checking URL
-        await expect(page).toHaveURL(/\/room-detail\/\d+/);
+        await expect(page).toHaveURL(RoomTestData.URL_PATTERNS.roomDetail);
         
     });
 
@@ -43,8 +44,8 @@ test.describe.serial('RoomDetails ====>', () => {
         // Step1: Access website
         await homePage.goto();
 
-        // Step2: Do a search (location only)
-        await homePage.selectLocation('Hồ Chí Minh');
+        // Step2: Do a search using test data
+        await homePage.selectLocation(SearchTestData.DEFAULT_LOCATION);
         await homePage.clickSearchIconButton();
 
         // Step3: Wait for results to load
@@ -54,7 +55,7 @@ test.describe.serial('RoomDetails ====>', () => {
         await Helper.scrollDown(page, 300);
 
         // Step5: Click on first room card to view details
-        await homePage.clickRoomCard(0);
+        await homePage.clickRoomCard(RoomTestData.ROOM_INDICES.first);
 
         // Step6: Wait for room details page to load
         await page.waitForTimeout(2000);
@@ -68,33 +69,41 @@ test.describe.serial('RoomDetails ====>', () => {
         // Step9: Verify room location is displayed
         await expect(roomDetailsPage.roomLocation).toBeVisible();
 
-        // Step10: Verify room description is displayed
-        await expect(roomDetailsPage.roomDescription).toBeVisible();
+        // Step10: Verify room host type is displayed
+        await expect(roomDetailsPage.roomHost).toBeVisible();
 
-        // Step11: Verify room image is displayed
+        // Step11: Verify room type is displayed
+        await expect(roomDetailsPage.roomType).toBeVisible();
+
+        // Step12: Verify room image is displayed
         await expect(roomDetailsPage.roomIMG).toBeVisible();
 
-        // Step12: Verify price information is displayed
+        // Step13: Verify number of rooms is displayed
+        await expect(roomDetailsPage.numberRooms).toBeVisible();
+
+        // Step14: Verify number of beds is displayed
+        await expect(roomDetailsPage.numberBed).toBeVisible();
+
+        // Step15: Verify price information is displayed
         await expect(roomDetailsPage.price).toBeVisible();
 
-        // Step13: Verify number of guests information is displayed
+        // Step16: Verify number of guests information is displayed
         await expect(roomDetailsPage.numberGuest).toBeVisible();
 
-        // Step14: Verify room utilities section is displayed
+        // Step17: Verify room utilities section is displayed
         await expect(roomDetailsPage.roomUtilities).toBeVisible();
 
-        // Step15: Verify booking form is displayed
+        // Step18: Verify booking form is displayed
         await expect(roomDetailsPage.formBooking).toBeVisible();
 
-        // Step16: Verify comments/reviews section is displayed
+        // Step19: Verify comments/reviews section is displayed
         await expect(roomDetailsPage.commentsList).toBeVisible();
 
-        // Step17: Verify login required alert is displayed instead of comment form
-        // Alert message: "Cần đăng nhập để bình luận"
+        // Step20: Verify login required alert is displayed instead of comment form
         await expect(roomDetailsPage.loginRequiredAlert).toBeVisible();
         
-        // Step18: Verify login required alert contains correct text
-        await expect(roomDetailsPage.loginRequiredAlert).toContainText('Cần đăng nhập để bình luận');
+        // Step21: Verify login required alert contains correct text
+        await expect(roomDetailsPage.loginRequiredAlert).toContainText(SearchTestData.SEARCH_RESULT_MESSAGES.loginRequired);
     });
 
     // TC: Verify complete room information display
@@ -120,53 +129,62 @@ test.describe.serial('RoomDetails ====>', () => {
         // Step5: Wait for page to stabilize
         await page.waitForTimeout(2000);
 
-        // Step6: Do a search (location only)
-        await homePage.selectLocation('Hồ Chí Minh');
+        // Step6: Do a search using test data
+        await homePage.selectLocation(SearchTestData.DEFAULT_LOCATION);
         await homePage.clickSearchIconButton();
 
-        // Step3: Wait for results to load
+        // Step7: Wait for results to load
         await page.waitForTimeout(2000);
 
-        // Step4: Scroll gradually to bottom of page
+        // Step8: Scroll gradually to bottom of page
         await Helper.scrollDown(page, 300);
 
-        // Step5: Click on first room card to view details
-        await homePage.clickRoomCard(0);
+        // Step9: Click on first room card to view details
+        await homePage.clickRoomCard(RoomTestData.ROOM_INDICES.first);
 
-        // Step6: Wait for room details page to load
+        // Step10: Wait for room details page to load
         await page.waitForTimeout(2000);
 
-        // Step7: Scroll down on details page to see all information
+        // Step11: Scroll down on details page to see all information
         await Helper.scrollToBottom(page, 300, 500);
 
-        // Step8: Verify room title is displayed
+        // Step12: Verify room title is displayed
         await expect(roomDetailsPage.roomTitle).toBeVisible();
         
-        // Step9: Verify room location is displayed
+        // Step13: Verify room location is displayed
         await expect(roomDetailsPage.roomLocation).toBeVisible();
 
-        // Step10: Verify room description is displayed
-        await expect(roomDetailsPage.roomDescription).toBeVisible();
+        // Step14: Verify room host type is displayed
+        await expect(roomDetailsPage.roomHost).toBeVisible();
 
-        // Step11: Verify room image is displayed
+        // Step15: Verify room type is displayed
+        await expect(roomDetailsPage.roomType).toBeVisible();
+
+        // Step16: Verify room image is displayed
         await expect(roomDetailsPage.roomIMG).toBeVisible();
 
-        // Step12: Verify price information is displayed
+        // Step17: Verify number of rooms is displayed
+        await expect(roomDetailsPage.numberRooms).toBeVisible();
+
+        // Step18: Verify number of beds is displayed
+        await expect(roomDetailsPage.numberBed).toBeVisible();
+
+        // Step19: Verify price information is displayed
         await expect(roomDetailsPage.price).toBeVisible();
 
-        // Step13: Verify number of guests information is displayed
+        // Step20: Verify number of guests information is displayed
         await expect(roomDetailsPage.numberGuest).toBeVisible();
 
-        // Step14: Verify room utilities section is displayed
+        // Step21: Verify room utilities section is displayed
         await expect(roomDetailsPage.roomUtilities).toBeVisible();
 
-        // Step15: Verify booking form is displayed
+        // Step22: Verify booking form is displayed
         await expect(roomDetailsPage.formBooking).toBeVisible();
 
-        // Step16: Verify comments/reviews section is displayed
+        // Step23: Verify comments/reviews section is displayed
         await expect(roomDetailsPage.commentsList).toBeVisible();
 
-        // Step17: Verify comment form is displayed
+        // Step24: Verify comment form is displayed
         await expect(roomDetailsPage.formComment).toBeVisible();
     });
 

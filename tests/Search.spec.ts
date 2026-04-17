@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { Helper } from '../utils/helper';
+import { SearchTestData, RoomTestData } from '../utils/test-data';
 
 // Run all tests in this describe block sequentially (one after another)
 test.describe.serial('Module 2: Search ====>', () => {
@@ -12,11 +13,11 @@ test.describe.serial('Module 2: Search ====>', () => {
         await homePage.goto();
 
         // Step2: Click on location select
-        await homePage.selectLocation("Hồ Chí Minh");
+        await homePage.selectLocation(SearchTestData.DEFAULT_LOCATION);
 
-        //Check if "Hồ Chí Minh" option is displayed
+        //Check if location option is displayed
         await expect(
-            page.locator('p.font-bold', { hasText: 'Hồ Chí Minh' })
+            page.locator('p.font-bold', { hasText: SearchTestData.DEFAULT_LOCATION })
         ).toBeVisible();
 
         // Step3: Click Search Icon Button
@@ -24,15 +25,15 @@ test.describe.serial('Module 2: Search ====>', () => {
 
         // 1. Summary text
         await expect(
-            page.locator('p', { hasText: 'chỗ ở tại Hồ Chí Minh' })
+            page.locator('p', { hasText: `${SearchTestData.SEARCH_RESULT_MESSAGES.locationText} ${SearchTestData.DEFAULT_LOCATION}` })
         ).toBeVisible();
 
         // 2. Room list appears
-        const roomCards = page.locator('.ant-card');
+        const roomCards = page.locator(RoomTestData.ROOM_CARD_SELECTOR);
         await expect(roomCards.first()).toBeVisible();
 
         // 3. Room content correct
-        await expect(roomCards.first()).toContainText('Hồ Chí Minh');
+        await expect(roomCards.first()).toContainText(SearchTestData.DEFAULT_LOCATION);
 
     });
 
@@ -79,8 +80,8 @@ test.describe.serial('Module 2: Search ====>', () => {
         // Step1: Access website
         await homePage.goto();
 
-        // Step2: Select number of guests (2 guests)
-        const numGuests = 2;
+        // Step2: Select number of guests from test data
+        const numGuests = SearchTestData.DEFAULT_GUEST_COUNT;
         await homePage.selectGuests(numGuests);
 
         // Step3: Click Search Icon Button
@@ -90,7 +91,7 @@ test.describe.serial('Module 2: Search ====>', () => {
         await Helper.scrollDown(homePage.page, 400);
 
         // Step5: Verify room cards are displayed with guest information
-        const roomCards = page.locator('.ant-card');
+        const roomCards = page.locator(RoomTestData.ROOM_CARD_SELECTOR);
         await expect(roomCards.first()).toBeVisible();
 
         // Step6: Verify room details contain guest capacity information
@@ -102,7 +103,7 @@ test.describe.serial('Module 2: Search ====>', () => {
             
             // Verify the room info contains "khách" (guests) information
             const infoText = await roomDetailInfo.textContent();
-            const guestMatch = infoText?.match(/(\d+)\s*khách/);
+            const guestMatch = infoText?.match(SearchTestData.ROOM_INFO_PATTERNS.guestInfo);
             
             if (guestMatch) {
                 const roomCapacity = parseInt(guestMatch[1]);
@@ -123,8 +124,8 @@ test.describe.serial('Module 2: Search ====>', () => {
         // Step2: Scroll down to view filter options
         await Helper.scrollDown(homePage.page, 400);
 
-        // Step3: Set price filter using HomePage method
-        const minPrice = 20;
+        // Step3: Set price filter using test data
+        const minPrice = SearchTestData.PRICE_FILTER.defaultMin;
         await homePage.setPriceFilter(minPrice);
 
         // Step4: Verify price filter input is displayed
