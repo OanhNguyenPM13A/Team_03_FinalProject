@@ -47,9 +47,8 @@ export class RegisterPopup extends BasePage {
         }
         if (user.gender !== undefined) {
             await this.genderCombobox.click({ force: true });
-            await this.page.waitForTimeout(2000);
             const label = user.gender ? 'Nam' : 'Nữ';
-            await this.page.getByText(label, { exact: true }).click();
+            await this.page.locator('div.ant-select-item-option', { hasText: label }).click();
         }
     }
 
